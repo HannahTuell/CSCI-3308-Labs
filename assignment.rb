@@ -1,9 +1,13 @@
-# Hannah Tuell
+# Assignment 2: Programming in Ruby
 # CSCI 3308 - Fall 2013
+# -----------------------------------------------------------------------------
+# Author: Hannah Tuell
+#
 # Collaborators:
 #     Paul Kubala
 #     Ashley Morris
-
+#       I also looked through many question/answers on Stack Overflow
+# -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # Part 1 - Classes ------------------------------------------------------------
 #     a) Create a class Dessert with getters and setters for name and calories.
@@ -34,11 +38,13 @@ class Dessert
 
 end
 
+=begin
 # test cases
-#cake = Dessert.new("cake", 190)
-#cake = Dessert.new("cake", 210)
-#puts cake.healthy?
-#puts cake.delicious?
+cake = Dessert.new("cake", 190)
+cake = Dessert.new("cake", 210)
+puts cake.healthy?
+puts cake.delicious?
+=end
 
 # -----------------------------------------------------------------------------
 #     b)Create a class JellyBean that extends Dessert, and add a getter and
@@ -60,13 +66,15 @@ class JellyBean < Dessert
   end
 end
 
+=begin
 # test cases
-#bean = JellyBean.new("JellyBean", 190, "black licorice")
-#cake = Dessert.new("cake", 210)
-#puts "The cake is delicious?"
-#puts cake.delicious?
-#puts "The Jellybean is delicious?"
-#puts bean.delicious?
+bean = JellyBean.new("JellyBean", 190, "black licorice")
+cake = Dessert.new("cake", 210)
+puts "The cake is delicious?"
+puts cake.delicious?
+puts "The Jellybean is delicious?"
+puts bean.delicious?
+=end
 
 # -----------------------------------------------------------------------------
 # Part 2 - Object-Oriented Programming ----------------------------------------
@@ -99,11 +107,13 @@ class Foo
     attr_accessor_with_history :bar
 end
 
+=begin
 # test cases
-#f = Foo.new
-#f.bar = 1
-#f.bar = 2
-#p f.bar_history # => if your code works, should be [nil, 1, 2]
+f = Foo.new
+f.bar = 1
+f.bar = 2
+p f.bar_history # => if your code works, should be [nil, 1, 2]
+=end
 
 # -----------------------------------------------------------------------------
 # Part 3 - More OOP -----------------------------------------------------------
@@ -112,7 +122,10 @@ end
 class Numeric
 	@@currencies = {'yen' => 0.013, 'euro' => 1.292, 'rupee' => 0.019, 'dollar' =>1}
 	def method_missing(method_id)
-		singular_currency = method_id.to_s.gsub( /s$/, '') #=> gets rid of spaces and converts thing to string
+	    # converts the passed currency to a string and removes spaces and trailing 's'
+		singular_currency = method_id.to_s.gsub( /s$/, '') 
+		# if the desired currency (method_id) is defined in currencies
+		# then grab the conversion value and perform the conversion
 		if @@currencies.has_key?(singular_currency)
 			self * @@currencies[singular_currency]
 		else
@@ -120,11 +133,21 @@ class Numeric
 		end
 	end
 
-	def in(currency) #=> method takes in currency
-		singular_currency = currency.to_s.gsub( /s$/, '') #=> converts it to string
-		self / @@currencies[singular_currency] #=> goes into class variable, finds value from key
+	def in(currency) 
+	    # converts the passed currency to a string and removes spaces and trailing 's'
+		singular_currency = currency.to_s.gsub( /s$/, '')
+		# finds the conversion value for the passed currency and divides
+		# the 'self' object by that value to perform the conversion
+		self / @@currencies[singular_currency]
 	end
 end
+
+=begin
+# test cases
+p fiveDollarsInEuros = 5.dollars.in(:euros)
+p tenEurosInRupees = 10.euros.in(:rupees)
+p oneDollarInRupees = 1.dollar.in(:rupees)
+=end
 
 # -----------------------------------------------------------------------------
 #     b) Palindromes:  Adapt your solution from the "palindromes" question so 
@@ -132,23 +155,54 @@ end
 #        "foo".palindrome? (Hint: this should require fewer than 5 lines 
 #         of code.)
 
+# previous version from lab2.rb
+=begin
+def palindrome?(string)
+  var = string.downcase
+  var = var.gsub(/\W/, "").gsub(/\d/, "")
+  if var == var.reverse
+    puts "#{ string } is a palindrome."
+  else
+    puts "#{ string } is not a palindrome."
+  end
+end
+=end
+
 class String
 	def palindrome?
-		temp_str = self.downcase.gsub(/\W/, "")
-		temp_str == temp_str.reverse 
-	end
+		var = self.downcase.gsub(/\W/, "")  # removes non-words and upper-case
+        var == var.reverse                  # returns true if the reverse is the same
+    end
 end
+
+=begin
+# test cases
+t1 = "A man, a plan, a canal -- Panama"
+t2 = "Abracadabra"
+t3 = "Madam, I'm Adam!"
+p t1.palindrome?
+p t2.palindrome?
+p t3.palindrome?
+=end
 
 # -----------------------------------------------------------------------------
 #     c) Palindromes again: Adapt your palindrome solution so that it works on 
 #        Enumerables. That is: [1,2,3,2,1].palindrome? # => true
 
 module Enumerable
-	def palindrome?
-		array = {} #=> make empty array
-		self.collect{|num| num} == self.collect{|num|num}.reverse #=> compare array of numbers to its reversed self
-	end
+    # steps through the elements of the array and compares those
+    def palindrome?
+        self.collect{|v| v} == self.collect{|v| v}.reverse
+    end
 end
+
+=begin
+# test cases
+p [1,2,3,2,1].palindrome?
+p [5,5,5,6,5].palindrome?
+t1 = "A man, a plan, a canal -- Panama"
+p t1.palindrome?
+=end
 
 # -----------------------------------------------------------------------------
 # Part 4 - Blocks -------------------------------------------------------------
@@ -157,20 +211,45 @@ end
 #   enumerates every possible pair from the two collections, where the pair 
 #   consists of one element from each collection. 
 
+
 class CartesianProduct
-	include Enumerable
+    include Enumerable
+    
+    # constructor
+    def initialize(seqA, seqB)
+        @product = Array.new
+        # iterates through each passed sequence, isolating each element and builds an
+        # array holding a,b pairings called 'product'
+        seqA.each do |a|
+            seqB.each do |b|
+                temp = Array.new
+                temp.push(a,b)
+                @product.push(temp)
+            end
+        end
+        @product
+    end
 
-		def initialize(sequence1, sequence2)
-			@sequence1 = sequence1
-			@sequence2 = sequence2
-		end
-
-		def each
-			unless @sequence1.empty? && @sequence2.empty? #=>don't execute if the sequences are empty
-			combination_sequence = []
-			@sequence1.each do |s1|
-				combination_sequence << @sequence2.each {|s2| yield [s1] << s2} #=>iterate through the first sequence while putting the second sequence in an array with the first		
-			end
-		end
-	end
+    # instance method
+    # steps through each element of the product array (each: a,b) and applies the passed block
+    # description on them
+    def each
+        @product.each { |i| yield(i) }
+    end
 end
+
+=begin
+# test cases
+c = CartesianProduct.new([:a,:b], [4,5])
+c.each { |elt| puts elt.inspect }
+# [:a, 4]
+# [:a, 5]
+# [:b, 4]
+# [:b, 5]
+
+c = CartesianProduct.new([:a,:b], [])
+c.each { |elt| puts elt.inspect }
+# Nothing printed since Cartesian product of anything with an empty
+=end
+
+# -----------------------------------------------------------------------------
